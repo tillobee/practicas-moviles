@@ -24,12 +24,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: Text('Osiosi'),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (() {}),
+        child: const Icon(Icons.draw_outlined),
+      ),
       drawer: Drawer(
         child: ListView(
           children:  [
             const UserAccountsDrawerHeader(
               currentAccountPicture: CircleAvatar(
-                backgroundImage: NetworkImage('https://pps.whatsapp.net/v/t61.24694-24/322320749_1687092041708650_2296218376132150917_n.jpg?ccb=11-4&oh=01_AdQa6QoyysENgNH8h-nYVqCY-_t8QWWbPw12Ad-5WDfMpw&oe=63FA7EC0'),
+                backgroundImage: NetworkImage('https://logos.flamingtext.com/Word-Logos/si-design-china-name.png'),
               ),
               accountName: Text('Jou dou'), 
               accountEmail: Text('jd@gmail.com')
@@ -39,6 +43,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
               title: Text('Practica 1'),
               trailing: Icon(Icons.chevron_right),
               subtitle: Text('Descripcion de la practica'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.draw),
+              title: const Text('Crear tema'),
+              trailing: const Icon(Icons.chevron_right),
+              subtitle: const Text('Elegír tema personalizado para la aplicación'),
+              onTap:((){
+                Navigator.pushNamed(context, '/custom_theme');
+              }),
             ),
             DayNightSwitcher(
               isDarkModeEnabled: isDarkModeEnabled, 

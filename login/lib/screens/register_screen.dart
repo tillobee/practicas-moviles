@@ -31,6 +31,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
       label: Text('Password'),
       border:OutlineInputBorder()
     ),
+    obscureText: true,
+    validator: ValidationBuilder().build(),
+  );
+
+  final txtFirstN = TextFormField(
+    decoration: const InputDecoration(
+      label: Text('First name'),
+      border:OutlineInputBorder()
+    ),
+    validator: ValidationBuilder().build(),
+  );
+
+  final txtLastN = TextFormField(
+    decoration: const InputDecoration(
+      label: Text('Last name'),
+      border:OutlineInputBorder(),
+    ),
     validator: ValidationBuilder().build(),
   );
 
@@ -90,6 +107,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
+                    spaceH,
+                    txtFirstN,
+                    spaceH,
+                    txtLastN,
                     spaceH,
                     txtEmail,
                     spaceH,
