@@ -1,32 +1,67 @@
 import 'package:concentric_transition/concentric_transition.dart';
 import 'package:login/card_onboard.dart';
+import 'package:login/preferences.dart';
 import 'package:login/provider/theme_provider.dart';
 import 'package:login/routes.dart';
-import 'package:login/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Preferences.preferences();
+  runApp(MyApp());
+}
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  static SharedPreferences? mainPrefs;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  _loadApp() async {
+    MyApp.mainPrefs = await SharedPreferences.getInstance();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadApp();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
+     providers: [
         ChangeNotifierProvider(
-          create: (_)=>ThemeProvider(context)
+          create: (_)=>ThemeProvider(
+            context:context, 
+            isDark: Preferences.isDark, 
+            primaryColor: Preferences.primaryColor, 
+            secondaryColor: Preferences.secondaryColor
+          )
         )
       ],
-      child: PMSNApp(),
+      child: PMSNApp()
     );
   }
 }
 
-class PMSNApp extends StatelessWidget {
+class PMSNApp extends StatefulWidget {
   const PMSNApp({super.key});
+
+  @override
+  State<PMSNApp> createState() => _PMSNAppState();
+}
+
+class _PMSNAppState extends State<PMSNApp> {
 
   @override
   Widget build(BuildContext context) {

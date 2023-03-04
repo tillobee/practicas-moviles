@@ -1,8 +1,11 @@
 import 'package:day_night_switcher/day_night_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:login/main.dart';
 import 'package:login/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
+
+import '../preferences.dart';
 
 class CustomThemeScreen extends StatefulWidget {
 
@@ -38,13 +41,14 @@ class _CustomThemeScreenState extends State<CustomThemeScreen> {
     ThemeProvider theme = Provider.of<ThemeProvider>(context);
     ThemeData currentTheme = theme.getThemeData();
 
+
     _showPickerPrimary(){
       showDialog(
         context: context, 
         builder: (BuildContext context) => AlertDialog(
           title: const Text('Pick osi'),
           content: SingleChildScrollView(
-            child: BlockPicker(
+            child: MaterialPicker(
               pickerColor: pickerColor,
               onColorChanged: changeColor,
             ),
@@ -54,6 +58,7 @@ class _CustomThemeScreenState extends State<CustomThemeScreen> {
               onPressed: (() {
                 setState(() {
                   currentColor=pickerColor;
+
                   /* crea una copia de la data del tema actual y genera uno nuevo sobreescribiendo las propiedades que se especifican 
                     en el copyWith (COPIA CON) */
 
@@ -70,9 +75,13 @@ class _CustomThemeScreenState extends State<CustomThemeScreen> {
 
                   //Actualiza la variable global del tema o el PROVIDER del tema para que se actualice en toda la apicación
                   theme.setThemeData(_customTheme);
+
+                  Preferences.primaryColor=currentColor.value;
+
                   //cierra el dialogo con el color picker
                   Navigator.of(context).pop();
                 });
+                Preferences.primaryColor=currentColor.value;
               }),
               child: const Text('Si'), 
             )
@@ -87,7 +96,7 @@ class _CustomThemeScreenState extends State<CustomThemeScreen> {
         builder: (BuildContext context) => AlertDialog(
           title: const Text('Pick an accent color'),
           content: SingleChildScrollView(
-            child: BlockPicker(
+            child: MaterialPicker(
               pickerColor: pickerColor,
               onColorChanged: changeColor,
             )
@@ -103,6 +112,9 @@ class _CustomThemeScreenState extends State<CustomThemeScreen> {
                     )
                   );
                   theme.setThemeData(_customTheme);
+
+                  Preferences.secondaryColor=currentColor.value;
+
                   Navigator.of(context).pop();
                 });
               }), 
@@ -114,7 +126,9 @@ class _CustomThemeScreenState extends State<CustomThemeScreen> {
   
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: (() {}),
+        onPressed: (() {
+          print(Preferences.isDark);
+        }),
         child: const Icon(Icons.plus_one),
       ),
       body: Container(

@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:login/settings/styles._settings.dart';
 
 class ThemeProvider with ChangeNotifier {
 
-  ThemeData? _themeData;
-  ThemeProvider(BuildContext context){
-    _themeData=StyleSettings.lightTheme(context);
+ late ThemeData themeData;
+  
+  ThemeProvider({required context,required bool isDark, required int primaryColor,required int secondaryColor,}){
+    themeData=isDark?ThemeData.dark():ThemeData.light();
+    themeData = themeData.copyWith(
+      colorScheme: Theme.of(context).colorScheme.copyWith(
+          primary: Color(primaryColor),
+          secondary: Color(secondaryColor)
+        )
+    );
   }
 
-  getThemeData() => this._themeData;
+  getThemeData() => this.themeData;
 
   setThemeData(ThemeData theme){
-    this._themeData=theme;
+    this.themeData=theme;
     notifyListeners();
   }
 }

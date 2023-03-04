@@ -4,6 +4,8 @@ import 'package:login/provider/theme_provider.dart';
 import 'package:login/settings/styles._settings.dart';
 import 'package:provider/provider.dart';
 
+import '../preferences.dart';
+
 class DashboardScreen extends StatefulWidget {
   DashboardScreen({super.key});
 
@@ -56,6 +58,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             DayNightSwitcher(
               isDarkModeEnabled: isDarkModeEnabled, 
               onStateChanged:(isDarkModeEnabled){
+                Preferences.isDark=isDarkModeEnabled;
                 isDarkModeEnabled
                 ?theme.setThemeData(StyleSettings.darkTheme(context))
                 :theme.setThemeData(StyleSettings.lightTheme(context));
