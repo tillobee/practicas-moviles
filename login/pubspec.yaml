@@ -47,6 +47,13 @@ dependencies:
   concentric_transition: ^1.0.3
   lottie: ^2.2.0
   shared_preferences: ^2.0.18
+  intl: ^0.17.0
+  table_calendar: ^3.0.5
+  syncfusion_flutter_calendar: ^20.4.53
+  http: ^0.13.5
+  firebase_core: ^2.8.0
+  firebase_auth: ^4.3.0
+
 
 dev_dependencies:
   flutter_test:

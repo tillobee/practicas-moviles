@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:login/database/database_helper.dart';
+import 'package:login/provider/flags_provider.dart';
+import 'package:login/widgets/item_post_widget.dart';
+import 'package:provider/provider.dart';
 
 import '../models/post_model.dart';
 
@@ -23,15 +26,18 @@ class _ListPostState extends State<ListPost> {
 
   @override
   Widget build(BuildContext context) {
+
+    FlagsProvider flag = Provider.of<FlagsProvider>(context);
+
     return FutureBuilder(
-      future: database!.getPosts() ,
+      future: flag.getFlagListPost()==true ? database!.getPosts() : database!.getPosts() ,
       builder:(context, AsyncSnapshot<List<PostModel>> snapshot) {
         if(snapshot.hasData){
           return ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
               var objPostModel = snapshot.data![index];
-              return Container();
+              return ItemPostWidget(objPostModel: objPostModel);
             },
           );
         }else if(snapshot.hasError){

@@ -1,6 +1,7 @@
 import 'package:day_night_switcher/day_night_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:login/provider/theme_provider.dart';
+import 'package:login/screens/list_post.dart';
 import 'package:login/settings/styles._settings.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +18,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool isDarkModeEnabled=false;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    isDarkModeEnabled=Preferences.isDark;
+  }
+
+  @override
   Widget build(BuildContext context) {
 
    ThemeProvider theme = Provider.of<ThemeProvider>(context);
@@ -26,9 +34,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: Text('Osiosi'),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (() {}),
-        child: const Icon(Icons.draw_outlined),
+      body: ListPost(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: (() {
+          Navigator.pushNamed(context, '/add');
+        }),
+        label: const Text('add post'),
+        icon: const Icon(Icons.add_comment),
       ),
       drawer: Drawer(
         child: ListView(
@@ -55,10 +67,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Navigator.pushNamed(context, '/custom_theme');
               }),
             ),
+            ListTile(
+              leading: const Icon(Icons.calendar_today),
+              title: const Text('Calendario de eventos'),
+              trailing: const Icon(Icons.chevron_right),
+              subtitle: const Text('Visualiza tu agenda de eventos en un calendario.'),
+              onTap:((){
+                Navigator.pushNamed(context, '/si');
+              }),
+            ),
+            ListTile(
+              leading: const Icon(Icons.movie),
+              title: const Text('Api peliculas'),
+              trailing: const Icon(Icons.chevron_right),
+              subtitle: const Text('Lista de peliculas populares de API TMBD.'),
+              onTap:((){
+                Navigator.pushNamed(context, '/popular_videos');
+              }),
+            ),
             DayNightSwitcher(
               isDarkModeEnabled: isDarkModeEnabled, 
               onStateChanged:(isDarkModeEnabled){
-                Preferences.isDark=isDarkModeEnabled;
+                //Preferences.isDark=isDarkModeEnabled; //Establlecer la preferencia dentro de styleSettins para que no interfiera el switch con los botones de pantalla tema personalizado
                 isDarkModeEnabled
                 ?theme.setThemeData(StyleSettings.darkTheme(context))
                 :theme.setThemeData(StyleSettings.lightTheme(context));

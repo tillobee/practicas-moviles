@@ -59,13 +59,6 @@ class _CustomThemeScreenState extends State<CustomThemeScreen> {
                 setState(() {
                   currentColor=pickerColor;
 
-                  /* crea una copia de la data del tema actual y genera uno nuevo sobreescribiendo las propiedades que se especifican 
-                    en el copyWith (COPIA CON) */
-
-                  /* _customTheme=_customTheme.copyWith(
-                    //Sobreescribe el color del fondo de la aplicación
-                    backgroundColor: currentColor
-                  ); */
 
                   _customTheme= currentTheme.copyWith(
                     colorScheme: Theme.of(context).colorScheme.copyWith(
@@ -146,6 +139,49 @@ class _CustomThemeScreenState extends State<CustomThemeScreen> {
               onPressed: (_showPickerAccent), 
               child: const Text('Choose accent color'),
             ),
+            const SizedBox(height: 20,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: (){
+                    setState(() {
+                      _customTheme= ThemeData.light();
+                      _customTheme = _customTheme.copyWith(
+                        colorScheme: Theme.of(context).colorScheme.copyWith(
+                          primary: currentTheme.colorScheme.primary,
+                          secondary: currentTheme.colorScheme.secondary
+                        )
+                      );
+                      Preferences.isDark=false;
+                      theme.setThemeData(_customTheme);
+                    });
+                  },
+                  label: const Text('Light'),
+                  icon: const Icon(Icons.light_mode),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                ElevatedButton.icon(
+                  onPressed: (){
+                    setState(() {
+                      _customTheme= ThemeData.dark();
+                      _customTheme = _customTheme.copyWith(
+                        colorScheme: Theme.of(context).colorScheme.copyWith(
+                          primary: currentTheme.colorScheme.primary,
+                          secondary: currentTheme.colorScheme.secondary
+                        )
+                      );
+                      Preferences.isDark=true;
+                      theme.setThemeData(_customTheme);
+                    });
+                  },
+                  label: const Text('Dark'),
+                  icon: const Icon(Icons.dark_mode),
+                )
+              ],
+            )
           ],
         ),
        ),

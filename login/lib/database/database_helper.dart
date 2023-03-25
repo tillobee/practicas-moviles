@@ -1,59 +1,114 @@
+import 'dart:io';
+
+import 'package:login/models/event_model.dart';
+import 'package:login/models/post_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'dart:io';
 import 'package:path/path.dart';
 
-import '../models/post_model.dart';
-
 class DatabaseHelper {
-  static final nameDB = 'socialDB';
-  static final version = 1;
+  
+  static final nameDB = 'SOCIALDB';
+  static final versionDB = 2;
+  static final newVersionDB = 3;
 
   static Database? _database;
-  
   Future<Database> get database async {
-    if(_database != null) return _database!;
-    return _database=_initDatabase();
+    if( _database != null ) return _database!;
+    return _database = await _initDatabase();
   }
 
   _initDatabase() async{
     Directory folder = await getApplicationDocumentsDirectory();
     String pathDB = join(folder.path,nameDB);
-    await openDatabase(
+    return await openDatabase(
       pathDB,
-      version: version,
-      onCreate: _createTables
+      version: newVersionDB,
+      onCreate: _createTables,
+      onUpgrade: ((pathDB, versionDB, newVersionDB){
+        String query = '''
+          CREATE TABLE evento(
+            idEvento INTEGER PRIMARY KEY,
+            descripcion TEXT,
+            fecha DATE,
+            completado BOOLEAN
+          )
+        ''';
+        pathDB.execute(query);
+      })
     );
   }
 
   _createTables(Database db, int version) async{
-    String query = '''CREATE TABLE post(
-        idPost INTEGER PRIMARY KEY, 
-        descripcion VARCHAR(200),
-        date DATE
+    String query = '''CREATE TABLE tblPost (
+      idPost INTEGER PRIMARY KEY,
+      descripcion VARCHAR(200),
+      date DATE
     )''';
     db.execute(query);
   }
 
-  Future<int> insert(String tblName, Map<String,dynamic> data) async {
+  Future<int> insert(String tblName, Map<String,dynamic> data) async{
     var conexion = await database;
     return conexion.insert(tblName, data);
   }
 
-  Future<int> update(String tblName, Map<String,dynamic> data) async{
-    var con = await database;
-    return con.update(tblName, data,where: 'idPost=?',whereArgs: [data['idPost']] );
+  Future<int> update(String tblName,Map<String,dynamic> data) async{
+    var conexion = await database;
+    return conexion.update(tblName,data,
+    where: 'idPost = ?',
+    whereArgs:[data['idPost']]);
   }
 
-  Future<int> delete(String tblName, int idPost) async{
-    var con = await database;
-    return con.delete(tblName,where:'idPost=?', whereArgs: [idPost] );
+  Future<int> delete(String tblName, int idPost) async {
+    var conexion = await database;
+    return conexion.delete(tblName,
+      where: 'idPost = ?',
+      whereArgs: [idPost]);
   }
 
-  Future<List<PostModel>>getPosts() async{
-    var con = await database;
-    var rs=await con.query('post');
-    return rs.map((post) => PostModel.fromMap(post)).toList();
+  Future<List<PostModel>> getPosts() async {
+    var conexion = await database;
+    var result = await conexion.query('tblPost');
+    return result.map((post) => PostModel.fromMap(post)).toList();
+  }
+
+  Future<List<EventModel>> getEvents() async {
+    var conexion = await database;
+    var result = await conexion.query('evento', orderBy: 'fecha DESC');
+    return result.map((event) => EventModel.fromMap(event)).toList();
+  }
+
+    Future<List<EventModel>> getEventsPerDay(String date) async {
+    var conexion = await database;
+    var result = await conexion.query('evento',
+                                  where: 'fecha=?',
+                                  whereArgs: [date]);
+    return result.map((event) => EventModel.fromMap(event)).toList();
+  }
+
+  Future<List<EventModel>> getEventsByDayRange(String firstDay, String lastDay) async {
+    var conexion = await database;
+    var result = await conexion.query('evento',
+                                    where: 'fecha>=? AND fecha<=?',
+                                    whereArgs: [firstDay,lastDay]);
+    return result.map((event)=> EventModel.fromMap(event)).toList();
+  }
+
+  Future<int> deleteEvent(int idEvento) async{ 
+    var conexion = await database;
+    return conexion.delete('evento',
+                          where: 'idEvento=?',
+                          whereArgs: [idEvento]
+    );
+  }
+
+  Future<List<EventModel>> getEventsByID(int idEvento) async {
+    var conexion = await database;
+    var result = await conexion.query('evento',
+                                  where: 'idEvento=?',
+                                  whereArgs: [idEvento]);
+    return result.map((event) => EventModel.fromMap(event)).toList();
   }
 
 }
