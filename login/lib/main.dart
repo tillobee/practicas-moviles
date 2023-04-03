@@ -1,7 +1,10 @@
 import 'package:concentric_transition/concentric_transition.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:login/card_onboard.dart';
+import 'package:login/database/database_helper.dart';
+import 'package:login/models/favourite_model.dart';
 import 'package:login/preferences.dart';
+import 'package:login/provider/favourites_provider.dart';
 import 'package:login/provider/flags_provider.dart';
 import 'package:login/provider/theme_provider.dart';
 import 'package:login/routes.dart';
@@ -28,6 +31,9 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
+  DatabaseHelper? databaseHelper;
+  List<FavouriteModel>? _favs=[];
+
   _loadApp() async {
     MyApp.mainPrefs = await SharedPreferences.getInstance();
   }
@@ -36,6 +42,8 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    databaseHelper =DatabaseHelper();
+    _getFavourites();
     _loadApp();
   }
 
@@ -53,10 +61,23 @@ class _MyAppState extends State<MyApp> {
         ),
         ChangeNotifierProvider(
           create: (_)=>FlagsProvider()
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (_)=>FavouritesProvider(favourites: _favs!))
       ],
       child: PMSNApp()
     );
+  }
+
+  _getFavourites(){
+    _favs=[];
+    Future res = databaseHelper!.getFavourites();
+    res.then((data){
+      for (var fav in data) {
+        FavouriteModel favourite = fav;
+        _favs!.add(favourite);
+      }
+    },onError: (e)=>print(e));
   }
 }
 

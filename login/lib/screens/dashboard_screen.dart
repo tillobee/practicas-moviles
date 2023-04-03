@@ -85,6 +85,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Navigator.pushNamed(context, '/popular_videos');
               }),
             ),
+             ListTile(
+              leading: const Icon(Icons.co_present_rounded),
+              title: const Text('Valorant API - Agentes'),
+              trailing: const Icon(Icons.chevron_right),
+              subtitle: const Text('Lista de agentes de Valorant'),
+              onTap:((){
+                Navigator.pushNamed(context, '/list_agents');
+              }),
+            ),
             DayNightSwitcher(
               isDarkModeEnabled: isDarkModeEnabled, 
               onStateChanged:(isDarkModeEnabled){

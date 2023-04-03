@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:login/firebase/email_auth.dart';
 import 'package:login/responsive.dart';
 import 'package:login/widgets/loading_modal_widget.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
@@ -11,17 +12,10 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-final txtEmail =  TextFormField(
-  decoration: const InputDecoration(
-    label: Text('email'),
-    border: OutlineInputBorder()),
-);
+TextEditingController email = TextEditingController();
+TextEditingController passwd = TextEditingController();
 
-final txtPass =  TextFormField( 
-  decoration: const InputDecoration(
-    label: Text('password'),
-    border: OutlineInputBorder()),
-);  
+
 
 final btnGoogle = SocialLoginButton(
   buttonType: SocialLoginButtonType.google,
@@ -44,10 +38,25 @@ final spaceH= SizedBox(height: 15);
 
 class _LoginScreenState extends State<LoginScreen> {
 
+  EmailAuth emailAuth = EmailAuth();
   bool isLoading =false;
 
   @override
   Widget build(BuildContext context) {
+
+    final txtEmail =  TextFormField(
+      controller: email,
+      decoration: const InputDecoration(
+        label: Text('email'),
+        border: OutlineInputBorder()),
+    );
+
+    final txtPass =  TextFormField( 
+      controller: passwd,
+      decoration: const InputDecoration(
+        label: Text('password'),
+        border: OutlineInputBorder()),
+    );  
 
   final txtRegister = Padding(
     padding: const EdgeInsets.symmetric(vertical: 20),
@@ -64,11 +73,21 @@ class _LoginScreenState extends State<LoginScreen> {
     onPressed: () {
       isLoading =true;
       setState(() {}); //renderiza la interfaz
-      Future.delayed(Duration(milliseconds: 4000)).then((value){
-        setState(() {
+      emailAuth.signInWithEmailAndPassword(
+        email: email.text,
+        password: passwd.text
+      ).then((value){
+        if(value){   
           isLoading=false;
           Navigator.pushNamed(context, '/dash');
-        });
+        }else{
+          isLoading=false;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('error')
+            )
+          );
+        }
       });
     },
   );
@@ -135,9 +154,19 @@ class WebViewWidget extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        txtEmail,
+                        TextFormField(
+                          controller: email,
+                          decoration: const InputDecoration(
+                            label: Text('email'),
+                            border: OutlineInputBorder()),
+                        ),
                         spaceH,
-                        txtPass,
+                        TextFormField( 
+                          controller: passwd,
+                          decoration: const InputDecoration(
+                            label: Text('password'),
+                            border: OutlineInputBorder()),
+                        ),
                         spaceH,
                         btnEmail,
                         spaceH,
@@ -209,9 +238,19 @@ class MobileViewWidget extends StatelessWidget {
                           spaceH
                         ],
                       ),
-                      txtEmail,
+                      TextFormField(
+                        controller: email,
+                        decoration: const InputDecoration(
+                          label: Text('email'),
+                          border: OutlineInputBorder()),
+                      ),
                       spaceH,
-                      txtPass,
+                      TextFormField( 
+                        controller: passwd,
+                        decoration: const InputDecoration(
+                          label: Text('password'),
+                          border: OutlineInputBorder()),
+                      ),
                       spaceH,
                       btnEmail,
                       spaceH,

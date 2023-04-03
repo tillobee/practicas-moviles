@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:login/firebase/email_auth.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
 
 
@@ -18,7 +19,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _noImg=true;
   String _path='';
 
+  EmailAuth? emailAuth = EmailAuth();
+
   final spaceH = SizedBox(height: 15);
+
+  TextEditingController email = TextEditingController();
+    TextEditingController password = TextEditingController();
+
 
   /* final btnSend = SocialLoginButton(
     buttonType: SocialLoginButtonType.generalLogin, 
@@ -108,18 +115,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     spaceH,
-                    txtFirstN,
+                    TextFormField(
+                      controller: email,
+                      decoration: const InputDecoration(
+                        label: Text('Email'),
+                        border:OutlineInputBorder()
+                      ),
+                      validator: ValidationBuilder().email().maxLength(100).build(),
+                    ),
                     spaceH,
-                    txtLastN,
-                    spaceH,
-                    txtEmail,
-                    spaceH,
-                    txtPass,
+                    TextFormField(
+                      controller: password,
+                      decoration: const InputDecoration(
+                        label: Text('Password'),
+                        border:OutlineInputBorder()
+                      ),
+                      obscureText: true,
+                      validator: ValidationBuilder().build(),
+                    ),
                     spaceH,
                     SocialLoginButton(
                       buttonType: SocialLoginButtonType.generalLogin, 
                       text: 'Registrar cuenta',
-                      onPressed:(() {_validate();}) 
+                      onPressed:(() {
+                        _validate();
+                        emailAuth!.createUserWithEmailAndPassword(
+                            email: email.text,
+                            password: password.text
+                          );
+                        }
+                      ) 
                     )
                   ],
                 ),

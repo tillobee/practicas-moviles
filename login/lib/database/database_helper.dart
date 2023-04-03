@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:login/models/event_model.dart';
+import 'package:login/models/favourite_model.dart';
 import 'package:login/models/post_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -9,8 +10,8 @@ import 'package:path/path.dart';
 class DatabaseHelper {
   
   static final nameDB = 'SOCIALDB';
-  static final versionDB = 2;
-  static final newVersionDB = 3;
+  static final versionDB = 5;
+  static final newVersionDB = 5;
 
   static Database? _database;
   Future<Database> get database async {
@@ -23,18 +24,19 @@ class DatabaseHelper {
     String pathDB = join(folder.path,nameDB);
     return await openDatabase(
       pathDB,
-      version: newVersionDB,
+      version: versionDB,
       onCreate: _createTables,
-      onUpgrade: ((pathDB, versionDB, newVersionDB){
+      onUpgrade: ((Database db, int oldV, int newV){
         String query = '''
-          CREATE TABLE evento(
-            idEvento INTEGER PRIMARY KEY,
-            descripcion TEXT,
-            fecha DATE,
-            completado BOOLEAN
-          )
+          CREATE TABLE IF NOT EXISTS favorito(
+            id INTEGER PRIMARY KEY,
+            posterPath VARCHAR(250),
+            originalTitle VARCHAR(250)
+          );
         ''';
-        pathDB.execute(query);
+       if(oldV<newV){
+         db.execute(query);
+       }
       })
     );
   }
@@ -44,6 +46,12 @@ class DatabaseHelper {
       idPost INTEGER PRIMARY KEY,
       descripcion VARCHAR(200),
       date DATE
+    );
+    CREATE TABLE IF NOT EXISTS evento(
+      idEvento INTEGER PRIMARY KEY,
+      descripcion TEXT,
+      fecha DATE,
+      completado BOOLEAN
     )''';
     db.execute(query);
   }
@@ -51,6 +59,11 @@ class DatabaseHelper {
   Future<int> insert(String tblName, Map<String,dynamic> data) async{
     var conexion = await database;
     return conexion.insert(tblName, data);
+  }
+
+  Future<int> deleteAll(String tblName) async {
+    var conexion = await database;
+    return conexion.delete(tblName);
   }
 
   Future<int> update(String tblName,Map<String,dynamic> data) async{
@@ -79,6 +92,7 @@ class DatabaseHelper {
     return result.map((event) => EventModel.fromMap(event)).toList();
   }
 
+  //Eventos para caleendario
     Future<List<EventModel>> getEventsPerDay(String date) async {
     var conexion = await database;
     var result = await conexion.query('evento',
@@ -109,6 +123,21 @@ class DatabaseHelper {
                                   where: 'idEvento=?',
                                   whereArgs: [idEvento]);
     return result.map((event) => EventModel.fromMap(event)).toList();
+  }
+
+  //Métodos que obtienen los datos de las peliculas favoritas
+  Future<List<FavouriteModel>> getFavourites() async {
+    var conexion = await database;
+    var result = await conexion.query('favorito');
+    return result.map((favourite) => FavouriteModel.fromMap(favourite)).toList();
+  }
+
+  Future<int> deleteFavourite(int favouriteID) async {
+    var conexion = await database;
+    return conexion.delete('favorito',
+                          where: 'id=?',
+                          whereArgs: [favouriteID]
+    );
   }
 
 }
