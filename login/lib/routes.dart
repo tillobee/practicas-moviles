@@ -24,6 +24,6 @@ Map<String, WidgetBuilder> getApplicationRoutes(){
     '/popular_videos':(BuildContext context) => ListPopularVideosScreen(),
     '/movie_detail':(BuildContext context) => MovieDetailScreen(),
     '/favourite_movies':(BuildContext context) => ListFavouriteMoviesScreen(),
-    '/list_agents':(BuildContext context) => ListAgentsScreen()
+    '/list_agents':(BuildContext context, ) => ListAgentsScreen()
   };  
 }
