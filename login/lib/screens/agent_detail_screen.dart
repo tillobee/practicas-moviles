@@ -186,6 +186,7 @@ class _AgentDetailScreenState extends State<AgentDetailScreen> with TickerProvid
                               children: [
                                 Text(agent.displayName!,
                                   style: const TextStyle(
+                                    color: Colors.white,
                                     letterSpacing: 5,
                                     fontStyle: FontStyle.italic,
                                     fontSize: 40,
@@ -213,6 +214,7 @@ class _AgentDetailScreenState extends State<AgentDetailScreen> with TickerProvid
                             textAlign: TextAlign.justify,
                             style: const TextStyle(
                               fontSize:15,
+                              color: Colors.white,
                               shadows: [
                                 Shadow(
                                   blurRadius: 20.0,

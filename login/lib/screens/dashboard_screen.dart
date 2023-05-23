@@ -1,6 +1,11 @@
 import 'package:day_night_switcher/day_night_switcher.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:login/firebase/git_auth.dart';
+import 'package:login/firebase/google_auth.dart';
 import 'package:login/provider/theme_provider.dart';
+import 'package:login/provider/user_provider.dart';
+import 'package:login/screens/list_favourites_cloud.dart';
 import 'package:login/screens/list_post.dart';
 import 'package:login/settings/styles._settings.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +21,8 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   bool isDarkModeEnabled=false;
+  GoogleAuth _googleAuth = GoogleAuth();
+  GitAuth _gitAuth = GitAuth();
 
   @override
   void initState() {
@@ -29,12 +36,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
    ThemeProvider theme = Provider.of<ThemeProvider>(context);
 
+   final userProvider = context.watch<UserProvider>();
+   UserCredential user = userProvider.getUserData();
+   String name;
+
+   if(user.user!.displayName != null){
+    name = user.user!.displayName!;
+   }else if(user.additionalUserInfo!.profile!['name']!=null){
+    name = user.additionalUserInfo!.profile!['name'];
+   }else if(user.additionalUserInfo!.username != null){
+    name = user.additionalUserInfo!.username!;
+   }else{
+    name= 'no name available';
+   }
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Osiosi'),
       ),
-      body: ListPost(),
+      /* body: ListFavouritesCloud(), */ //ListPost(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: (() {
           Navigator.pushNamed(context, '/add');
@@ -45,12 +65,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       drawer: Drawer(
         child: ListView(
           children:  [
-            const UserAccountsDrawerHeader(
+            UserAccountsDrawerHeader(
               currentAccountPicture: CircleAvatar(
-                backgroundImage: NetworkImage('https://logos.flamingtext.com/Word-Logos/si-design-china-name.png'),
+                backgroundImage: user.user!.photoURL != null ? 
+                  NetworkImage(user.user!.photoURL!): 
+                  const NetworkImage('https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png')
               ),
-              accountName: Text('Jou dou'), 
-              accountEmail: Text('jd@gmail.com')
+              accountName: Text(name), 
+              accountEmail: Text(user.user!.email!)
             ),
             const ListTile(
               leading: Icon(Icons.settings),
@@ -94,6 +116,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Navigator.pushNamed(context, '/list_agents');
               }),
             ),
+            ListTile(
+              leading: const Icon(Icons.map),
+              title: const Text('Mapas'),
+              trailing: const Icon(Icons.chevron_right),
+              subtitle: const Text('mapas'),
+              onTap:((){
+                Navigator.pushNamed(context, '/maps');
+              }),
+            ),
             DayNightSwitcher(
               isDarkModeEnabled: isDarkModeEnabled, 
               onStateChanged:(isDarkModeEnabled){
@@ -103,10 +134,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 :theme.setThemeData(StyleSettings.lightTheme(context));
                 this.isDarkModeEnabled=isDarkModeEnabled;
                 setState(() {});
-            })
+              }
+            ),
+            Padding( //Sign Out button
+              padding: const EdgeInsets.all(10.0),
+              child: ElevatedButton(
+                onPressed: (){
+                  _signOut(user.additionalUserInfo!.providerId);
+                }, 
+                style: ButtonStyle(
+                  elevation: MaterialStateProperty.all(10),
+                  backgroundColor: MaterialStateProperty.all(Colors.red)
+                ),
+                child: const Text('sign out'),
+              ),
+            ),
+
           ],
         ),
       ),
     );
+  }
+
+  _signOut(String? provider){
+    switch(provider){
+      case 'github.com':{
+        //GitAuth.signOut()
+        _gitAuth.gitEmailSignOut();
+        Navigator.pushNamed(context, '/home');
+      }  
+      break;
+      
+      case 'google.com':{
+        //GoogleAuth.signOut()
+        _googleAuth.googleSignOut();
+        Navigator.pushNamed(context, '/home');
+      } 
+      break;
+      
+      default:{
+        //EmailAuth.signOut()
+        _gitAuth.gitEmailSignOut();
+        Navigator.pushNamed(context, '/home');
+      }
+      break;
+
+    }
+
   }
 }

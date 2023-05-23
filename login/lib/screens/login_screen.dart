@@ -1,8 +1,15 @@
+import 'dart:isolate';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login/firebase/email_auth.dart';
+import 'package:login/firebase/git_auth.dart';
+import 'package:login/firebase/google_auth.dart';
+import 'package:login/provider/user_provider.dart';
 import 'package:login/responsive.dart';
 import 'package:login/widgets/loading_modal_widget.dart';
+import 'package:provider/provider.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -14,10 +21,11 @@ class LoginScreen extends StatefulWidget {
 
 TextEditingController email = TextEditingController();
 TextEditingController passwd = TextEditingController();
+GoogleAuth googleAuth = GoogleAuth();
+GitAuth _gitAuth = GitAuth();
+EmailAuth emailAuth = EmailAuth();
 
-
-
-final btnGoogle = SocialLoginButton(
+final btnGoogle= SocialLoginButton(
   buttonType: SocialLoginButtonType.google,
   onPressed: () {},
 );
@@ -38,7 +46,7 @@ final spaceH= SizedBox(height: 15);
 
 class _LoginScreenState extends State<LoginScreen> {
 
-  EmailAuth emailAuth = EmailAuth();
+
   bool isLoading =false;
 
   @override
@@ -77,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
         email: email.text,
         password: passwd.text
       ).then((value){
-        if(value){   
+        if(value!=null){   
           isLoading=false;
           Navigator.pushNamed(context, '/dash');
         }else{
@@ -190,8 +198,8 @@ class WebViewWidget extends StatelessWidget {
   }
 }
 
-class MobileViewWidget extends StatelessWidget {
-  const MobileViewWidget({
+class MobileViewWidget extends StatefulWidget {
+  MobileViewWidget({
     Key? key,
     required this.btnEmail,
     required this.txtRegister,
@@ -200,73 +208,194 @@ class MobileViewWidget extends StatelessWidget {
 
   final SocialLoginButton btnEmail;
   final Padding txtRegister;
-  final bool isLoading;
+  bool isLoading;
 
   @override
+  State<MobileViewWidget> createState() => _MobileViewWidgetState();
+}
+
+class _MobileViewWidgetState extends State<MobileViewWidget> {
+  @override
   Widget build(BuildContext context) {
+
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     return Stack(
       children: [
-        Container(
-          width: double.infinity,
-          height: MediaQuery.of(context).size.height,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              opacity: .4,
-              fit: BoxFit.cover,
-              image: AssetImage('assets/1.jpeg')
-            )
-          ),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Column(
-                        children: [
-                          spaceH,
-                          Row(
-                            children: [
-                              const Spacer(),
-                              Expanded(
-                                flex: 8,
-                                child:Image.asset('assets/logo.png') 
-                              ),
-                              const Spacer()
-                            ],
-                          ),
-                          spaceH
-                        ],
-                      ),
-                      TextFormField(
-                        controller: email,
-                        decoration: const InputDecoration(
-                          label: Text('email'),
-                          border: OutlineInputBorder()),
-                      ),
-                      spaceH,
-                      TextFormField( 
-                        controller: passwd,
-                        decoration: const InputDecoration(
-                          label: Text('password'),
-                          border: OutlineInputBorder()),
-                      ),
-                      spaceH,
-                      btnEmail,
-                      spaceH,
-                      btnGoogle,
-                      spaceH,
-                      btnFb,
-                      spaceH,
-                      btnGit,
-                      spaceH,
-                      txtRegister
-                    ],
-                  ),
+        WillPopScope(
+          child: Container(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                opacity: .4,
+                fit: BoxFit.cover,
+                image: AssetImage('assets/1.jpeg')
+              )
+            ),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Column(
+                          children: [
+                            spaceH,
+                            Row(
+                              children: [
+                                const Spacer(),
+                                Expanded(
+                                  flex: 8,
+                                  child:Image.asset('assets/logo.png') 
+                                ),
+                                const Spacer()
+                              ],
+                            ),
+                            spaceH
+                          ],
+                        ),
+                        TextFormField(
+                          controller: email,
+                          decoration: const InputDecoration(
+                            label: Text('email'),
+                            border: OutlineInputBorder()),
+                        ),
+                        spaceH,
+                        TextFormField( 
+                          controller: passwd,
+                          decoration: const InputDecoration(
+                            label: Text('password'),
+                            border: OutlineInputBorder()),
+                        ),
+                        spaceH,
+                        SocialLoginButton(
+                        buttonType: SocialLoginButtonType.generalLogin,
+                        onPressed: () {
+                          widget.isLoading =true;
+                          setState(() {}); //renderiza la interfaz
+                          emailAuth.signInWithEmailAndPassword(
+                            email: email.text,
+                            password: passwd.text
+                          ).then((value){
+                            if(value!=null){   
+                              final user = value;
+                              
+                              setState(() {
+                               widget.isLoading=false; 
+                              });
+        
+                              userProvider.setUserData(user);
+                              Navigator.pushNamed(context, '/dash');
+                            }else{
+                              widget.isLoading=false;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('error')
+                                )
+                              );
+                            }
+                          });
+                        },
+                        ),
+                        spaceH,
+                        SocialLoginButton(
+                          buttonType: SocialLoginButtonType.google,
+                          onPressed: () {
+                            widget.isLoading=true;
+                            setState(() {});
+                            googleAuth.googleSignIn().then((value){
+                              if(value!=null){
+                                UserCredential user = value;
+                                
+                                setState(() {
+                                  widget.isLoading=false;
+                                });
+        
+                                userProvider.setUserData(user);
+                                Navigator.pushNamed(context, '/dash');
+                              }else{
+                                setState(() {
+                                  widget.isLoading=false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('error')
+                                  )
+                                );
+                              }
+                            });
+                          },
+                        ),
+                        spaceH,
+                        btnFb,
+                        spaceH,
+                        SocialLoginButton(
+                          buttonType: SocialLoginButtonType.github, 
+                          onPressed: (){
+                            widget.isLoading=true;
+                            setState(() {});
+                            _gitAuth.signInWithGitHub(context).then((value) {
+                              if(value!=null){
+                                UserCredential user = value;
+                                  
+                                setState((){
+                                  widget.isLoading=false;
+                                });
+        
+                                userProvider.setUserData(user);
+                                Navigator.pushNamed(context, '/dash');
+                              }
+                              else{
+                                setState(() {
+                                  widget.isLoading=false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('error')
+                                  )
+                                );
+                              }
+                            });
+                          }
+                        ),
+                        spaceH,
+                        widget.txtRegister,
+                        ElevatedButton(onPressed: (){
+                          final user = FirebaseAuth.instance.currentUser;
+                          print(user.toString());
+                        }, child: Text('si'))
+                      ],
+                    ),
+              ),
             ),
           ),
+          onWillPop: () async {
+            return await showDialog(
+              context: context, 
+              builder: (context) =>  AlertDialog(
+                title: const Text('exit'),
+                content: const Text('¿Salir?'),
+                actions: [
+                  ElevatedButton(
+                    onPressed: (){
+                      Navigator.pop(context);
+                      SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+                    }, 
+                    child: const Text('si')
+                  ),
+                  ElevatedButton(
+                    onPressed: (){
+                      Navigator.pop(context);
+                    }, 
+                    child: const Text('No')
+                  )
+                ],
+              )
+            );
+          },
         ),
-        isLoading? const LoadingModalWidget():Container()
+        widget.isLoading? const LoadingModalWidget():Container()
       ],
     );
   }

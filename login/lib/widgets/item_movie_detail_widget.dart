@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:login/database/database_helper.dart';
+import 'package:login/firebase/favourites_firebase.dart';
 import 'package:login/models/favourite_model.dart';
 import 'package:login/models/movie_detail_model.dart';
 import 'package:login/provider/favourites_provider.dart';
@@ -22,6 +23,7 @@ class ItemMovieDetail extends StatefulWidget {
 class _ItemMovieDetailState extends State<ItemMovieDetail> {
 
   DatabaseHelper? databaseHelper;
+  FavouritesFirebase? _ffirebase;
 
   bool? isTrailerAvailable;
   double? _popPercent, _popPercentIndicator;
@@ -39,6 +41,7 @@ class _ItemMovieDetailState extends State<ItemMovieDetail> {
     super.initState();
 
     databaseHelper = DatabaseHelper();
+    _ffirebase=FavouritesFirebase();
 
     final String url;
     _markedFavourite=widget.isFavourite;
@@ -78,6 +81,15 @@ class _ItemMovieDetailState extends State<ItemMovieDetail> {
               _markedFavourite = !_markedFavourite;
               if(_markedFavourite){
                 _heartIcon = const Icon(Icons.favorite, color: Colors.red,);
+
+                _ffirebase!.insertFavourites({
+                  'poster_path':widget.movieDetail.posterPath,
+                  'overview':widget.movieDetail.overview,
+                  'title':widget.movieDetail.originalTitle,
+                  'vote_count':widget.movieDetail.voteCount
+                  }
+                );
+
                 databaseHelper!.insert('favorito', {
                   'id':widget.movieDetail.id,
                   'posterPath':widget.movieDetail.posterPath,

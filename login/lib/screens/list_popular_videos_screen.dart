@@ -65,7 +65,7 @@ class _ListPopularVideosScreenState extends State<ListPopularVideosScreen> {
       ),
       body: FutureBuilder(
         future: apiPopular!.getAllPopular(),
-        initialData: loadingPopular,
+        /* initialData: loadingPopular, */
         builder: (context, AsyncSnapshot<List<PopularModel>?> snapshot) {
           if(snapshot.hasData){
             return GridView.builder(

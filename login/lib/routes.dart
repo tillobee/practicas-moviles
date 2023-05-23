@@ -6,6 +6,7 @@ import 'package:login/screens/dashboard_screen.dart';
 import 'package:login/screens/event_calendar_screen.dart';
 import 'package:login/screens/list_agents_agents.dart';
 import 'package:login/screens/list_favourite_movies_screen.dart';
+import 'package:login/screens/list_favourites_cloud.dart';
 import 'package:login/screens/list_popular_videos_screen.dart';
 import 'package:login/screens/login_screen.dart';
 import 'package:login/screens/movie_detail_screen.dart';
@@ -24,6 +25,9 @@ Map<String, WidgetBuilder> getApplicationRoutes(){
     '/popular_videos':(BuildContext context) => ListPopularVideosScreen(),
     '/movie_detail':(BuildContext context) => MovieDetailScreen(),
     '/favourite_movies':(BuildContext context) => ListFavouriteMoviesScreen(),
-    '/list_agents':(BuildContext context, ) => ListAgentsScreen()
+    '/list_agents':(BuildContext context, ) => ListAgentsScreen(),
+    '/favourites_cloud':(BuildContext context, ) => ListFavouritesCloud(),
+    '/maps':(BuildContext context, ) => ListFavouritesCloud(),
+
   };  
 }

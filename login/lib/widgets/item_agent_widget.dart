@@ -33,6 +33,7 @@ class ItemAgentWidget extends StatelessWidget {
         width: MediaQuery.of(context).size.width,
         height: 150,
         child: Card(
+          color: Color.fromARGB(255, 62, 62, 62),
           elevation: 20,
           semanticContainer: false,
           shape: const RoundedRectangleBorder(
@@ -57,11 +58,11 @@ class ItemAgentWidget extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                        children: [
-                        Text(agent.displayName!,style: const TextStyle(fontSize: 20),),
+                        Text(agent.displayName!,style: const TextStyle(fontSize: 20,color: Colors.white),),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(agent.role!.displayName!,style: const TextStyle(fontSize: 17),),
+                            Text(agent.role!.displayName!,style: const TextStyle(fontSize: 17, color: Colors.white),),
                             SizedBox(
                               width: iconsWidth,
                               height: iconsHeight,

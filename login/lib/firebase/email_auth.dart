@@ -20,7 +20,7 @@ class EmailAuth {
     }
   }
 
-  Future<bool> signInWithEmailAndPassword({
+  Future<UserCredential?> signInWithEmailAndPassword({
     required String email,
     required String password
   }) async {
@@ -30,10 +30,10 @@ class EmailAuth {
         password: password
       );
       if(userCredential.user!.emailVerified){
-        return true;
-      } return false;
+        return userCredential;
+      } return null;
     } catch (e) {
-      return false;
+      return null;
     }
   }
 }

@@ -2,11 +2,13 @@ import 'package:concentric_transition/concentric_transition.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:login/card_onboard.dart';
 import 'package:login/database/database_helper.dart';
+import 'package:login/firebase/init_firebase.dart';
 import 'package:login/models/favourite_model.dart';
 import 'package:login/preferences.dart';
 import 'package:login/provider/favourites_provider.dart';
 import 'package:login/provider/flags_provider.dart';
 import 'package:login/provider/theme_provider.dart';
+import 'package:login/provider/user_provider.dart';
 import 'package:login/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -15,8 +17,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
   await Preferences.preferences();
+  await InitFirebase.initFirebase();
+  /* await Firebase.initializeApp(); */
   runApp(MyApp());
 }
 
@@ -63,7 +66,11 @@ class _MyAppState extends State<MyApp> {
           create: (_)=>FlagsProvider()
         ),
         ChangeNotifierProvider(
-          create: (_)=>FavouritesProvider(favourites: _favs!))
+          create: (_)=>FavouritesProvider(favourites: _favs!)
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>UserProvider()
+        )
       ],
       child: PMSNApp()
     );

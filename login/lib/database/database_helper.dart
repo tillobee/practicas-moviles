@@ -10,8 +10,8 @@ import 'package:path/path.dart';
 class DatabaseHelper {
   
   static final nameDB = 'SOCIALDB';
-  static final versionDB = 5;
-  static final newVersionDB = 5;
+  static final versionDB = 1;
+  static final newVersionDB = 2;
 
   static Database? _database;
   Future<Database> get database async {
@@ -26,34 +26,26 @@ class DatabaseHelper {
       pathDB,
       version: versionDB,
       onCreate: _createTables,
-      onUpgrade: ((Database db, int oldV, int newV){
-        String query = '''
-          CREATE TABLE IF NOT EXISTS favorito(
-            id INTEGER PRIMARY KEY,
-            posterPath VARCHAR(250),
-            originalTitle VARCHAR(250)
-          );
-        ''';
-       if(oldV<newV){
-         db.execute(query);
-       }
-      })
     );
   }
 
   _createTables(Database db, int version) async{
-    String query = '''CREATE TABLE tblPost (
-      idPost INTEGER PRIMARY KEY,
-      descripcion VARCHAR(200),
-      date DATE
-    );
-    CREATE TABLE IF NOT EXISTS evento(
+    db.execute('''CREATE TABLE evento(
       idEvento INTEGER PRIMARY KEY,
       descripcion TEXT,
       fecha DATE,
       completado BOOLEAN
-    )''';
-    db.execute(query);
+    )''');
+    db.execute('''CREATE TABLE favorito(
+      id INTEGER PRIMARY KEY,
+      posterPath VARCHAR(200),
+      originalTitle VARCHAR(200)
+    )''');
+    db.execute('''CREATE TABLE tblPost (
+      idPost INTEGER PRIMARY KEY,
+      descripcion VARCHAR(200),
+      date DATE
+    )''');
   }
 
   Future<int> insert(String tblName, Map<String,dynamic> data) async{

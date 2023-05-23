@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Preferences {
   static bool _isDark=false;
-  static int _primaryColor=4280391411;
-  static int _secondaryColor=4294967295;
+  static int _primaryColor=const Color.fromARGB(255, 176, 255, 190).value;
+  static int _secondaryColor=const Color.fromARGB(255, 3, 109, 6).value;
+  static bool _isLogged = false;
 
 
   static late SharedPreferences _prefs;
@@ -39,5 +41,13 @@ class Preferences {
     return _prefs.getInt('secondaryColor') ?? _secondaryColor;
   }
 
+  static set isLogged(bool logged){
+    _isLogged = logged;
+    _prefs.setBool('isLogged', logged);
+  }
+
+  static bool get isLogged{
+    return _prefs.getBool('isLogged') ?? _isLogged;
+  }
 
 }
